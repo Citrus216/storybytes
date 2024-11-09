@@ -35,7 +35,7 @@ function textToSpeechElevenLabs(text, filename = 'output.mp3') {
       const tempDir = path.join(__dirname, 'temp');
       const filePath = path.join(tempDir, filename);
   
-      fs.mkdirSync(tempDir, { recursive: true });
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
   
       const data = {
         text: text,
@@ -69,6 +69,8 @@ function textToSpeechElevenLabs(text, filename = 'output.mp3') {
         // Write the buffer to an MP3 file
         fs.writeFileSync(filePath, Buffer.from(audioBuffer));
         
+
+        
         resolve(`File saved as ${filePath}`);
       } catch (error) {
         reject(error);
@@ -77,9 +79,9 @@ function textToSpeechElevenLabs(text, filename = 'output.mp3') {
   }
   
   // Example usage
-  textToSpeechElevenLabs('Hello, this is a test using ElevenLabs.')
-    .then(message => console.log(message))
-    .catch(error => console.error('Error:', error));
+//   textToSpeechElevenLabs('Hello, this is a test using ElevenLabs.')
+//     .then(message => console.log(message))
+//     .catch(error => console.error('Error:', error));
 
 module.exports = {
     textToSpeech,
