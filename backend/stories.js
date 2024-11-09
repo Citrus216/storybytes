@@ -4,7 +4,7 @@
  */
 
 const OpenAI = require('openai');
-const openai = new OpenAI({apiKey: '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'});
+const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const default_story = [
   {
@@ -103,6 +103,15 @@ const generateStoryText = async (prompt, level, isFree = true) => {
       getImage(storyItem.image_description).then((image) => {
         jsonContent.story[index].image = image;
         delete jsonContent.story[index].image_description;
+      }, 
+      (error) => {
+        getImage = getFreeImage;
+        imagePromises.push(
+          getImage(storyItem.image_description).then((image) => {
+            jsonContent.story[index].image = image;
+            delete jsonContent.story[index].image_description;
+          })
+        );
       })
     );
   });
