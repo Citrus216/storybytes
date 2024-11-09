@@ -28,51 +28,48 @@ export function Menu() {
 
     return (
         <>
-            {/* Menu Icon */}
             <button className="menu-icon" onClick={toggleMenu}>
                 ☰
             </button>
-
-            {/* Sidebar Menu */}
-            {isOpen && (
-                <div className="menu">
-                    <h2>Menu</h2>
-                    <button className="close-menu" onClick={toggleMenu}>
-                        Close
-                    </button>
-                    <ul>
-                        <li onClick={() => handleNavigate('/')}>Home</li>
-                    </ul>
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        <Droppable droppableId="stories">
-                            {(provided) => (
-                                <ul
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className="story-list"
-                                >
-                                    {stories.map((story, index) => (
-                                        <Draggable key={story.name} draggableId={story.name} index={index}>
-                                            {(provided) => (
-                                                <li
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    onClick={() => handleNavigate(`/story/${story.name}`)}
-                                                    className="story-item"
-                                                >
-                                                    {story.name}
-                                                </li>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </ul>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
-                </div>
-            )}
+              <div className={`menu ${isOpen ? 'open' : 'closed'}`}>
+                  <div className="menu-header">
+                      <h2>Menu</h2>
+                      <button className="close-menu" onClick={toggleMenu}>
+                          ←
+                      </button>
+                  </div>
+                  <ul>
+                      <li className="menu-link" onClick={() => handleNavigate('/')}>Home</li>
+                  </ul>
+                  <DragDropContext onDragEnd={onDragEnd}>
+                      <Droppable droppableId="stories">
+                          {(provided) => (
+                              <ul
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                  className="story-list"
+                              >
+                                  {stories.map((story, index) => (
+                                      <Draggable key={story.name} draggableId={story.name} index={index}>
+                                          {(provided) => (
+                                              <li
+                                                  ref={provided.innerRef}
+                                                  {...provided.draggableProps}
+                                                  {...provided.dragHandleProps}
+                                                  onClick={() => handleNavigate(`/story/${story.name}`)}
+                                                  className="story-item menu-link"
+                                              >
+                                                  {story.name}
+                                              </li>
+                                          )}
+                                      </Draggable>
+                                  ))}
+                                  {provided.placeholder}
+                              </ul>
+                          )}
+                      </Droppable>
+                  </DragDropContext>
+              </div>
         </>
     );
 }
