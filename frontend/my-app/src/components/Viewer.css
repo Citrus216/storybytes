@@ -1,0 +1,32 @@
+.story-container {
+    margin-top: 1rem;
+}
+
+.story-page {
+    display: flex;
+    align-items: center;
+}
+
+.story-image {
+    width: 50%;
+}
+
+.story-text {
+    width: 50%;
+    padding: 0 1rem;
+}
+
+.full-width-image {
+    width: 100%;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.navigation-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
