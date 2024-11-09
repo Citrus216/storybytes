@@ -13,7 +13,6 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
  console.log(audio)
 
  useEffect(() => {
-   // Load new audio file when currentPage changes
    if (story.audios && story.audios[currentPage]) {
     const newAudio = new Audio(`http://localhost:8080/files/${story.audios[currentPage]}`);
     newAudio.onloadeddata = () => {
@@ -22,6 +21,15 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
    }
  }, [currentPage, story.audios]);
 
+ useEffect(() => {
+  return () => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  };
+}, [audio]);
+
  const handlePlayAudio = () => {
   if (audio) {
     audio.play();
@@ -29,12 +37,18 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
 };
 
 const handleNext = () => {
+  if (audio) {
+    audio.pause();
+  }
   if (currentPage < story.images.length - 1) {
     setCurrentPage(currentPage + 1);
   }
 };
 
 const handlePrevious = () => {
+  if (audio) {
+    audio.pause();
+  }
   if (currentPage > 0) {
     setCurrentPage(currentPage - 1);
   }
