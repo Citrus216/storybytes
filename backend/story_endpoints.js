@@ -16,8 +16,8 @@ router.get('/story', (req, res) => {
   const poemMode = req.query.poemMode === 'true';
   
   // TODO Remove feature flag when paid image generation for entire story is available
-  generateStoryText(queryDecoded, level, poemMode, true).then((storyText) => {
-  // generateStoryText(queryDecoded, level, req.runType === 'free').then((storyText) => {
+  // generateStoryText(queryDecoded, level, poemMode, true).then((storyText) => {
+  generateStoryText(queryDecoded, level, poemMode, req.runType === 'free').then((storyText) => {
     res.json(storyText);
   }).catch((error) => {
     console.error(error);
