@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useStories } from "./DataContext";
 import { useNavigate } from 'react-router-dom';
+//import './HomePage.css'
 
 type InputBoxProps = {
     onSubmit: (url: string) => void;
@@ -22,12 +23,9 @@ export function InputBox({ onSubmit }: InputBoxProps) {
                 const storyData = response.data.story;
                 const formattedStory = {
                     name: response.data.cover.title,
-                    images: [
-                        response.data.cover.image, // Add the cover image first
-                        ...storyData.map((page: any) => page.image) // Add other images
-                    ],
+                    images: [response.data.cover.image, ...storyData.map((page: any) => page.image)],
                     pages: storyData.map((page: any) => page.text),
-                    audios: []
+                    audios: [response.data.cover.audio, ...storyData.map((page: any) => page.audio)]
                 };
 
                 addStory(formattedStory);
@@ -52,7 +50,7 @@ export function InputBox({ onSubmit }: InputBoxProps) {
                 value={queryText}
                 onChange={(e) => setQuery(e.target.value)}
             />
-            <button onClick={performSearch}>Search</button>
+            <button onClick={performSearch} className="button" >Search</button>
         </div>
     );
 }
