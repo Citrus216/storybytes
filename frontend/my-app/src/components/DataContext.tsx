@@ -73,6 +73,7 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
 
 const useStories = () => {
   const context = useContext(StoriesContext);
+  console.log("StoriesContext:", context);
   if (!context) {
     throw new Error('useStories must be used within a StoriesProvider');
   }
