@@ -6,7 +6,15 @@ import {Menu} from './Menu';
 import {NameLogo} from './NameLogo';
 
 const HomePage: React.FC = () => {
-  return <h1>Home</h1>;
+    const handleSearchSubmit = (url: string) => {
+        console.log("URL received from InputBox:", url);
+    };
+    return (
+        <div>
+            <h1>HOME</h1>
+            <InputBox onSubmit={handleSearchSubmit} />
+        </div>
+  )
 };
 
 export default HomePage;
