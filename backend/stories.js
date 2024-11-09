@@ -16,7 +16,7 @@ const path = require('path');
 // load image urls from default_images.json
 const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_images.json')));
 
-const generateStoryText = async (prompt, level, isFree = true) => {
+const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
   if (level === undefined) {
     level = 3;
   }
@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, isFree = true) => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are an author writing a short story for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
+        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
