@@ -31,39 +31,68 @@ for (let i = 0; i < default_story.length; i++) {
 }
 
 const generateStoryText = async (prompt) => {
-  // const gptResponse = await openai.chat.completions.create({
-  //   model: "gpt-4o",
-  //   messages: [
-  //       {"role": "user", "content": prompt},
-  //       {"role": "system", "content": "You are an author writing a children's book for children in grades K-2."}
-  //   ],
-  //   response_format: {
-  //       // See /docs/guides/structured-outputs
-  //       type: "json_schema",
-  //       json_schema: {
-  //           name: "story_schema",
-  //           schema: {
-  //               type: "list",
-  //               items: {
-  //                   type: "object",
-  //                   properties: {
-  //                       text: {
-  //                           type: "string"
-  //                       },
-  //                       image_description: {
-  //                           type: "string"
-  //                       }
-  //                   },
-  //                   required: ["text", "image_description"],
-  //                   additionalProperties: false
-  //               },
-  //               additionalProperties: false
-  //           }
-  //       }
-  //   }
-  // });
-  // return gptResponse.choices[0].message.content;
-  return default_story;
+  const gptResponse = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+        {"role": "user", "content": prompt},
+        {"role": "system", "content": "You are an author writing a children's book for children in grades K-2. All books you write are 10 pages. Each page has 5 sentences."}
+    ],
+    response_format: {
+        // See /docs/guides/structured-outputs
+        type: "json_schema",
+        json_schema: {
+            name: "story_schema",
+            schema: {
+                type: "object",
+                properties: {
+                  cover: {
+                    type: "object",
+                    properties: {
+                      title: {
+                        type: "string"
+                      },
+                      image_description: {
+                        type: "string"
+                      }
+                    }
+                  },
+                  story: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string"
+                        },
+                        image_description: {
+                          type: "string"
+                        }
+                      },
+                      required: ["text", "image_description"]
+                    }
+                  }
+                },
+                additionalProperties: false
+            }
+        }
+    }
+  });
+  const jsonContent = JSON.parse(gptResponse.choices[0].message.content);
+  // first do cover image
+  jsonContent.cover.image = await getImage(jsonContent.cover.image_description);
+  delete jsonContent.cover.image_description;
+  // then do story images
+  for (let i = 0; i < jsonContent.story.length; i++) {
+    jsonContent.story[i].image = await getImage(jsonContent.story[i].image_description);
+    delete jsonContent.story[i].image_description;
+  }
+  return jsonContent;
+}
+
+let i = 0
+
+const getImage = async (prompt) => {
+  return image_urls[i++ % 11];
 }
 
 module.exports = {
