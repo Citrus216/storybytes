@@ -26,8 +26,3 @@ function textToSpeech(text, filename = 'output.mp3') {
         });
     });
 }
-
-// Example usage
-textToSpeech("Hello, this is a sample text-to-speech conversion.", "sample.mp3")
-    .then(message => console.log(message))
-    .catch(error => console.error("Error:", error));
