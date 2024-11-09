@@ -20,6 +20,7 @@ const StoriesContext = createContext<{
   stories: Story[];
   addStory: (story: Story) => void;
   removeStory: (name: string) => void;
+  setStories: (stories: Story[]) => void;
 } | undefined>(undefined);
 
 const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesState => {
@@ -59,8 +60,12 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: 'REMOVE_STORY',name});
   };
 
+  const setStories = (stories: Story[]) => {
+    dispatch({ type: 'SET_STORIES', stories });
+  };
+
   return (
-    <StoriesContext.Provider value={{ stories: state.stories, addStory, removeStory }}>
+    <StoriesContext.Provider value={{ stories: state.stories, addStory, removeStory, setStories }}>
       {children}
     </StoriesContext.Provider>
   );
