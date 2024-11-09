@@ -3,7 +3,7 @@ const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 async function getImageUrl(prompt) {
-    styledPrompt = `In the style of a children's story illustration, ${prompt}`;
+    styledPrompt = `In the style of a children's story illustration with no text: ${prompt}`;
     try {
         const response = await openai.images.generate({
             model: 'dall-e-3',
@@ -20,8 +20,8 @@ async function getImageUrl(prompt) {
 
 const apiKey = process.env.GETIMGAI_API_KEY;
 
-async function getImageUrl_getimgai(prompt) {
-    const styledPrompt = `In the style of a children's story illustration, ${prompt}`;
+async function getImageUrl_getimgai(prompt, level) {
+    const styledPrompt = `In the style of a story illustration appropriate for grade ${level}: ${prompt}`;
     // const url = 'https://api.getimg.ai/v1/stable-diffusion-xl/text-to-image';
     // const options = {
     //     method: 'POST',
@@ -48,15 +48,13 @@ async function getImageUrl_getimgai(prompt) {
           prompt: styledPrompt,
           width: 1024,
           height: 1024,
-          steps: 4,
+          steps: 6,
           output_format: 'jpeg',
           response_format: 'url'
         })
       };
     const response = await fetch(url, options);
     const data = await response.json();
-    console.log(data);
-    console.log(data.url);
     return data.url;
 }
 
