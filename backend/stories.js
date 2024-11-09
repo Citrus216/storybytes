@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
+        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 4 pages. Each page has 8 sentences.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
@@ -87,7 +87,6 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
   imagePromises.push(
     getImage(jsonContent.cover.image_description).then((image) => {
       jsonContent.cover.image = image;
-      delete jsonContent.cover.image_description;
     })
   );
 
@@ -96,14 +95,12 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
     imagePromises.push(
       getImage(storyItem.image_description).then((image) => {
         jsonContent.story[index].image = image;
-        delete jsonContent.story[index].image_description;
       }, 
       (error) => {
         getImage = getFreeImage;
         imagePromises.push(
           getImage(storyItem.image_description).then((image) => {
             jsonContent.story[index].image = image;
-            delete jsonContent.story[index].image_description;
           })
         );
       })
