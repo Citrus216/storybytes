@@ -1,26 +1,23 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
+import { useStories } from './components/DataContext';
+import Homepage from './components/HomePage';
+import StoryPage from './components/StoryPage';
 
-function App() {
+const App: React.FC = () => {
+  const { stories } = useStories();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        {stories.map((story) => (
+          <Route key={story.name} path={`/story/${story.name}`} element={<StoryPage story={story} />} />
+        ))}
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
