@@ -3,8 +3,6 @@ import axios from 'axios';
 import { useStories } from "./DataContext";
 import { useNavigate } from 'react-router-dom';
 //import './HomePage.css'
-import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
 
 type InputBoxProps = {
     onSubmit: (url: string) => void;
