@@ -4,8 +4,8 @@ const path = require('path');
 
 const router = express.Router();
 
-router.get('/files/:filepath', (req, res) => {
-  const filePath = req.params.filepath;
+router.get('/files/*', (req, res) => {
+  const filePath = req.params[0];
   const absolutePath = path.resolve(`temp/${filePath}`);
 
   fs.stat(absolutePath, (err, stats) => {

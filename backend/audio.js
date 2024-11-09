@@ -26,3 +26,7 @@ function textToSpeech(text, filename = 'output.mp3') {
         });
     });
 }
+
+module.exports = {
+    textToSpeech,
+};
