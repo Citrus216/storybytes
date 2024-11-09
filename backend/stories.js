@@ -31,39 +31,45 @@ for (let i = 0; i < default_story.length; i++) {
 }
 
 const generateStoryText = async (prompt) => {
-  // const gptResponse = await openai.chat.completions.create({
-  //   model: "gpt-4o",
-  //   messages: [
-  //       {"role": "user", "content": prompt},
-  //       {"role": "system", "content": "You are an author writing a children's book for children in grades K-2."}
-  //   ],
-  //   response_format: {
-  //       // See /docs/guides/structured-outputs
-  //       type: "json_schema",
-  //       json_schema: {
-  //           name: "story_schema",
-  //           schema: {
-  //               type: "list",
-  //               items: {
-  //                   type: "object",
-  //                   properties: {
-  //                       text: {
-  //                           type: "string"
-  //                       },
-  //                       image_description: {
-  //                           type: "string"
-  //                       }
-  //                   },
-  //                   required: ["text", "image_description"],
-  //                   additionalProperties: false
-  //               },
-  //               additionalProperties: false
-  //           }
-  //       }
-  //   }
-  // });
-  // return gptResponse.choices[0].message.content;
-  return default_story;
+  const gptResponse = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+        {"role": "user", "content": prompt},
+        {"role": "system", "content": "You are an author writing a children's book for children in grades K-2."}
+    ],
+    response_format: {
+        // See /docs/guides/structured-outputs
+        type: "json_schema",
+        json_schema: {
+            name: "story_schema",
+            schema: {
+                type: "object",
+                properties: {
+                  title: {
+                    type: "string"
+                  },
+                  story: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string"
+                        },
+                        image_description: {
+                          type: "string"
+                        }
+                      },
+                      required: ["text", "image_description"]
+                    }
+                  }
+                },
+                additionalProperties: false
+            }
+        }
+    }
+  });
+  return JSON.parse(gptResponse.choices[0].message.content);
 }
 
 module.exports = {
