@@ -9,9 +9,12 @@ router.get('/story', (req, res) => {
   if (!query) {
     return res.status(400).send('Query parameter q is required');
   }
-  // Call generateStoryText function from stories.js and send as json in body {story: storyText}
-  generateStoryText(query).then((storyText) => {
-    res.json({ story: storyText });
+  const queryDecoded = decodeURIComponent(query);
+  // get optional query parameter level
+  const level = req.query.level;
+  
+  generateStoryText(queryDecoded, level).then((storyText) => {
+    res.json(storyText);
   }).catch((error) => {
     console.error(error);
     res.status(500).send('An error occurred while generating the story');
