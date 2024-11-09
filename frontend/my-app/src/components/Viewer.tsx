@@ -10,8 +10,6 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
  const [currentPage, setCurrentPage] = useState(0);
  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
- console.log(audio)
-
  useEffect(() => {
    if (story.audios && story.audios[currentPage]) {
     const newAudio = new Audio(`http://localhost:8080/files/${story.audios[currentPage]}`);
@@ -55,51 +53,70 @@ const handlePrevious = () => {
 };
 
 return (
-  <div className="story-container">
-    {currentPage === 0 ? (
-      // First page: display the first image alone
-      <div>
-        <img
-          src={story.images[0]}
-          alt={`Page ${currentPage + 1}`}
-          className="full-width-image"
-        />
-      </div>
-    ) : (
-      // Subsequent pages: display image and text side-by-side
-      <div className="story-page">
-        <img
-          src={story.images[currentPage]}
-          alt={`Page ${currentPage + 1}`}
-          className="story-image"
-        />
-        <p className="story-text">{story.pages[currentPage - 1]}</p>
-      </div>
-    )}
-
-      <button onClick={handlePlayAudio} className="audio-button">
-        Play Audio
-      </button>
-
-    {/* Navigation buttons */}
-    <div className="navigation-buttons">
-      <button
-        onClick={handlePrevious}
-        disabled={currentPage === 0}
-        className="navigation-button"
-      >
-        Previous
-      </button>
-      <button
-        onClick={handleNext}
-        disabled={currentPage === story.images.length - 1}
-        className="navigation-button"
-      >
-        Next
-      </button>
+    <div className="story-container">
+      {currentPage === 0 ? (
+        // First page: display the first image as cover
+        <div className="cover-page">
+          <div className="cover-housing">
+            <img
+              src={story.images[0]}
+              alt={`Cover Page`}
+              className="full-width-image"
+            />
+          </div>
+          <div className="navigation-buttons">
+            <button
+              onClick={handlePrevious}
+              disabled={currentPage === 0}
+              className="prev-button">
+              <i className="fas fa-angle-left"></i>
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={currentPage === story.images.length - 1}
+              className="next-button">
+              <i className="fas fa-angle-right"></i>
+            </button>
+          </div>
+          <button onClick={handlePlayAudio} className="audio-button">
+            <i className="fas fa-volume-up"></i>
+          </button>
+        </div>
+      ) : (
+        // Subsequent pages: display image and text side-by-side
+        <div className="story-page">
+          <div className="img-text-housing">
+            <img
+              src={story.images[currentPage]}
+              alt={`Page ${currentPage + 1}`}
+              className="story-image"
+            />
+            <p className="story-text">{story.pages[currentPage - 1]}</p>
+          </div>
+          <div className="navigation-buttons">
+            <button
+              onClick={handlePrevious}
+              disabled={currentPage === 0}
+              className="prev-button">
+              <i className="fas fa-angle-left"></i>
+            </button>
+            <span className="page-counter">
+              Page {currentPage} of {story.images.length - 1}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={currentPage === story.images.length - 1}
+              className="next-button">
+              <i className="fas fa-angle-right"></i>
+            </button>
+          </div>
+          <button onClick={handlePlayAudio} className="audio-button">
+            <i className="fas fa-volume-up"></i>
+          </button>
+        </div>
+      )}
     </div>
-  </div>
- ); 
+  );
 };
 
 export default Viewer;
