@@ -1,20 +1,22 @@
+
 /**
  * This file is used for application logic for story generation. This does not use express.
  */
 
 const OpenAI = require('openai');
-const openai = new OpenAI({apiKey: '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'});
+const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const { textToSpeech } = require('./audio.js');
+const { getImageUrl } = require('./images');
 const uuid = require('uuid');
+
 
 const fs = require('fs');
 const path = require('path');
 // load image urls from default_images.json
 const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_images.json')));
 
-
-const generateStoryText = async (prompt, level) => {
+const generateStoryText = async (prompt, level, isFree = true) => {
   if (level === undefined) {
     level = 3;
   }
@@ -75,21 +77,53 @@ const generateStoryText = async (prompt, level) => {
     jsonContent.story[i].audio = `${jsonContent.uuid}/page${i}.mp3`;
   }
 
-  // first do cover image
-  jsonContent.cover.image = await getImage(jsonContent.cover.image_description);
-  delete jsonContent.cover.image_description;
-  // then do story images
-  for (let i = 0; i < jsonContent.story.length; i++) {
-    jsonContent.story[i].image = await getImage(jsonContent.story[i].image_description);
-    delete jsonContent.story[i].image_description;
-  }
+
+  // Create an array of promises for the cover and story images
+  const imagePromises = [];
+
+  const getImage = isFree ? getFreeImage : getPaidImage;
+
+  // Cover image promise
+  imagePromises.push(
+    getImage(jsonContent.cover.image_description).then((image) => {
+      jsonContent.cover.image = image;
+      delete jsonContent.cover.image_description;
+    })
+  );
+
+  // Story images promises
+  jsonContent.story.forEach((storyItem, index) => {
+    imagePromises.push(
+      getImage(storyItem.image_description).then((image) => {
+        jsonContent.story[index].image = image;
+        delete jsonContent.story[index].image_description;
+      }, 
+      (error) => {
+        getImage = getFreeImage;
+        imagePromises.push(
+          getImage(storyItem.image_description).then((image) => {
+            jsonContent.story[index].image = image;
+            delete jsonContent.story[index].image_description;
+          })
+        );
+      })
+    );
+  });
+
+  // Wait for all promises to resolve
+  await Promise.all(imagePromises);
+
   return jsonContent;
 }
 
 let i = 0
 
-const getImage = async (prompt) => {
+const getFreeImage = async (prompt) => {
   return image_urls[i++ % 11];
+}
+
+const getPaidImage = async (prompt) => {
+  return await getImageUrl(prompt);
 }
 
 module.exports = {

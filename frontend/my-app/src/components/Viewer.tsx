@@ -15,7 +15,6 @@ const handleNext = () => {
   }
 };
 
-
 const handlePrevious = () => {
   if (currentPage > 0) {
     setCurrentPage(currentPage - 1);
@@ -41,7 +40,7 @@ return (
           alt={`Page ${currentPage + 1}`}
           className="story-image"
         />
-        <p className="story-text">{story.pages[currentPage]}</p>
+        <p className="story-text">{story.pages[currentPage - 1]}</p>
       </div>
     )}
 
