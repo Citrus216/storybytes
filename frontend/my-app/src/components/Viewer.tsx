@@ -71,9 +71,6 @@ return (
               className="prev-button">
               <i className="fas fa-angle-left"></i>
             </button>
-            <span className="page-counter">
-              Page {currentPage + 1} of {story.images.length}
-            </span>
             <button
               onClick={handleNext}
               disabled={currentPage === story.images.length - 1}
@@ -104,7 +101,7 @@ return (
               <i className="fas fa-angle-left"></i>
             </button>
             <span className="page-counter">
-              Page {currentPage + 1} of {story.images.length}
+              Page {currentPage} of {story.images.length - 1}
             </span>
             <button
               onClick={handleNext}
