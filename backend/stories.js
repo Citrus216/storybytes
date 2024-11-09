@@ -7,7 +7,7 @@ const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const { textToSpeech } = require('./audio.js');
-const { getImageUrl } = require('./images');
+const { getImageUrl, getImageUrl_getimgai } = require('./images');
 const uuid = require('uuid');
 
 
@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 4 pages. Each page has 8 sentences.`}
+        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
@@ -120,7 +120,8 @@ const getFreeImage = async (prompt) => {
 }
 
 const getPaidImage = async (prompt) => {
-  return await getImageUrl(prompt);
+  //return await getImageUrl(prompt);
+  return await getImageUrl_getimgai(prompt);
 }
 
 module.exports = {
