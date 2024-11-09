@@ -3,9 +3,12 @@ const express = require('express');
 const storyEndpoints = require('./story_endpoints');
 const dictEndpoints = require('./dict_endpoints');
 const config = require('./config'); // Import config.js
+const cors = require('cors');
 
 const app = express();
 const port = 8080;
+
+app.use(cors());
 
 // Middleware to check if run type is set
 app.use(config.checkRunType); // This will prevent access to endpoints until run type is set
