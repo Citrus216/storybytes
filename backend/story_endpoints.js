@@ -12,9 +12,11 @@ router.get('/story', (req, res) => {
   const queryDecoded = decodeURIComponent(query);
   // get optional query parameter level
   const level = req.query.level;
+
+  const poemMode = req.query.poemMode === 'true';
   
   // TODO Remove feature flag when paid image generation for entire story is available
-  generateStoryText(queryDecoded, level, true).then((storyText) => {
+  generateStoryText(queryDecoded, level, poemMode, true).then((storyText) => {
   // generateStoryText(queryDecoded, level, req.runType === 'free').then((storyText) => {
     res.json(storyText);
   }).catch((error) => {
