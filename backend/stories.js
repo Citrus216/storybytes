@@ -30,12 +30,15 @@ for (let i = 0; i < default_story.length; i++) {
   default_story[i].image = image_urls[i];
 }
 
-const generateStoryText = async (prompt) => {
+const generateStoryText = async (prompt, level) => {
+  if (level === undefined) {
+    level = 3;
+  }
   const gptResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": "You are an author writing a children's book for children in grades K-2. All books you write are 10 pages. Each page has 5 sentences."}
+        {"role": "system", "content": `You are an author writing a short story for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
