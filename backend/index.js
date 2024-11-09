@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const storyEndpoints = require('./story_endpoints');
 const dictEndpoints = require('./dict_endpoints');
+const fileServer = require('./file-server');
 const config = require('./config'); // Import config.js
 const cors = require('cors');
 
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(config.checkRunType); // This will prevent access to endpoints until run type is set
 
 // Use the endpoints
+app.use('', fileServer);
 app.use('/api/v1', storyEndpoints);
 app.use('/api/v1', dictEndpoints);
 

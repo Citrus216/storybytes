@@ -6,31 +6,15 @@
 const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
-const default_story = [
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  },
-]
-
-//load image urls from default_images.json
-const fs = require('fs');
+const { textToSpeech } = require('./audio.js');
 const { getImageUrl } = require('./images');
-const image_urls = JSON.parse(fs.readFileSync('default_images.json', 'utf8'));
-for (let i = 0; i < default_story.length; i++) {
-  default_story[i].image = image_urls[i];
-}
+const uuid = require('uuid');
+
+
+const fs = require('fs');
+const path = require('path');
+// load image urls from default_images.json
+const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_images.json')));
 
 const generateStoryText = async (prompt, level, isFree = true) => {
   if (level === undefined) {
@@ -83,6 +67,16 @@ const generateStoryText = async (prompt, level, isFree = true) => {
     }
   });
   const jsonContent = JSON.parse(gptResponse.choices[0].message.content);
+  jsonContent.uuid = uuid.v4();
+
+  // generate audio files for tts for title and then each page
+  textToSpeech(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
+  jsonContent.cover.audio = `${jsonContent.uuid}/title.mp3`;
+  for(let i = 0; i < jsonContent.story.length; i++) {
+    textToSpeech(jsonContent.story[i].text, `${jsonContent.uuid}/page${i}.mp3`);
+    jsonContent.story[i].audio = `${jsonContent.uuid}/page${i}.mp3`;
+  }
+
 
   // Create an array of promises for the cover and story images
   const imagePromises = [];
