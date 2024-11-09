@@ -1,15 +1,21 @@
 const express = require('express');
+const { generateStoryText } = require('./stories');
 
 const router = express.Router();
 
-const stories = [
-  { id: 1, title: 'Story 1', content: 'This is the content of story 1' },
-  { id: 2, title: 'Story 2', content: 'This is the content of story 2' },
-  // Add more stories as needed
-];
-
 router.get('/story', (req, res) => {
-  res.json(stories);
+  // get query parameter q. It is url encoded
+  const query = req.query.q;
+  if (!query) {
+    return res.status(400).send('Query parameter q is required');
+  }
+  // Call generateStoryText function from stories.js and send as json in body {story: storyText}
+  generateStoryText(query).then((storyText) => {
+    res.json({ story: storyText });
+  }).catch((error) => {
+    console.error(error);
+    res.status(500).send('An error occurred while generating the story');
+  });
 });
 
 module.exports = router;
