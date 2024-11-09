@@ -13,7 +13,7 @@ router.get('/story', (req, res) => {
   // get optional query parameter level
   const level = req.query.level;
   
-  generateStoryText(queryDecoded, level).then((storyText) => {
+  generateStoryText(queryDecoded, level, req.runType === 'free').then((storyText) => {
     res.json(storyText);
   }).catch((error) => {
     console.error(error);

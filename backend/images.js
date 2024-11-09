@@ -17,6 +17,7 @@ async function getImageUrl(prompt) {
     }
 }
 
+// Test individual images by uncommenting and running node images.js
 // (async () => {
 //     try {
 //         const imageUrl = await getImageUrl('A young boy playing with his dog in the park.');

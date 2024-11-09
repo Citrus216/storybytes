@@ -1,3 +1,4 @@
+
 /**
  * This file is used for application logic for story generation. This does not use express.
  */
@@ -25,12 +26,13 @@ const default_story = [
 
 //load image urls from default_images.json
 const fs = require('fs');
+const { getImageUrl } = require('./images');
 const image_urls = JSON.parse(fs.readFileSync('default_images.json', 'utf8'));
 for (let i = 0; i < default_story.length; i++) {
   default_story[i].image = image_urls[i];
 }
 
-const generateStoryText = async (prompt, level) => {
+const generateStoryText = async (prompt, level, isFree = true) => {
   if (level === undefined) {
     level = 3;
   }
@@ -81,21 +83,44 @@ const generateStoryText = async (prompt, level) => {
     }
   });
   const jsonContent = JSON.parse(gptResponse.choices[0].message.content);
-  // first do cover image
-  jsonContent.cover.image = await getImage(jsonContent.cover.image_description);
-  delete jsonContent.cover.image_description;
-  // then do story images
-  for (let i = 0; i < jsonContent.story.length; i++) {
-    jsonContent.story[i].image = await getImage(jsonContent.story[i].image_description);
-    delete jsonContent.story[i].image_description;
-  }
+
+  // Create an array of promises for the cover and story images
+  const imagePromises = [];
+
+  const getImage = isFree ? getFreeImage : getPaidImage;
+
+  // Cover image promise
+  imagePromises.push(
+    getImage(jsonContent.cover.image_description).then((image) => {
+      jsonContent.cover.image = image;
+      delete jsonContent.cover.image_description;
+    })
+  );
+
+  // Story images promises
+  jsonContent.story.forEach((storyItem, index) => {
+    imagePromises.push(
+      getImage(storyItem.image_description).then((image) => {
+        jsonContent.story[index].image = image;
+        delete jsonContent.story[index].image_description;
+      })
+    );
+  });
+
+  // Wait for all promises to resolve
+  await Promise.all(imagePromises);
+
   return jsonContent;
 }
 
 let i = 0
 
-const getImage = async (prompt) => {
+const getFreeImage = async (prompt) => {
   return image_urls[i++ % 11];
+}
+
+const getPaidImage = async (prompt) => {
+  return await getImageUrl(prompt);
 }
 
 module.exports = {
