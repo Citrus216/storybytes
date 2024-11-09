@@ -2,14 +2,13 @@ const express = require('express');
 
 const router = express.Router();
 
-const stories = [
-  { id: 1, title: 'Story 1', content: 'This is the content of story 1' },
-  { id: 2, title: 'Story 2', content: 'This is the content of story 2' },
-  // Add more stories as needed
-];
-
 router.get('/story', (req, res) => {
-  res.json(stories);
+  // get query parameter q. It is url encoded
+  const query = req.query.q;
+  if (!query) {
+    return res.status(400).send('Query parameter q is required');
+  }
+  res.status(200).send(`You searched for the story: ${query}`);
 });
 
 module.exports = router;
