@@ -5,6 +5,7 @@
 .story-page {
     display: flex;
     align-items: center;
+    gap: 1rem;
 }
 
 .story-image {
@@ -24,6 +25,11 @@
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
+    width: 95%
+}
+
+.navigation-buttons button:hover {
+    transform: scale(1.1);
 }
 
 .navigation-button:disabled {

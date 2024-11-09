@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useStories } from "./DataContext";
 import { useNavigate } from 'react-router-dom';
+//import './HomePage.css'
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 
 type InputBoxProps = {
     onSubmit: (url: string) => void;
@@ -49,7 +52,7 @@ export function InputBox({ onSubmit }: InputBoxProps) {
                 value={queryText}
                 onChange={(e) => setQuery(e.target.value)}
             />
-            <button onClick={performSearch}>Search</button>
+            <button onClick={performSearch} className="button" >Search</button>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Story } from '../components/DataContext';
 import Viewer from './Viewer';
+import './StoryPage.css'
 
 interface StoryPageProps {
  story: Story;
@@ -8,8 +9,8 @@ interface StoryPageProps {
 
 const StoryPage: React.FC<StoryPageProps> = ({ story }) => {
     return (
-        <div>
-          <h1>{story.name}</h1>
+        <div className="story-container">
+          <h1 className="story-title">{story.name}</h1>
           <Viewer story={story} />
         </div>
     );
