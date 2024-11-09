@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Story } from './DataContext';
 import './Viewer.css';
 
@@ -8,6 +8,25 @@ interface StoryDisplayProps {
 
 const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
  const [currentPage, setCurrentPage] = useState(0);
+ const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+ console.log(audio)
+
+ useEffect(() => {
+   // Load new audio file when currentPage changes
+   if (story.audios && story.audios[currentPage]) {
+    const newAudio = new Audio(`http://localhost:8080/files/${story.audios[currentPage]}`);
+    newAudio.onloadeddata = () => {
+      setAudio(newAudio);
+    };
+   }
+ }, [currentPage, story.audios]);
+
+ const handlePlayAudio = () => {
+  if (audio) {
+    audio.play();
+  }
+};
 
 const handleNext = () => {
   if (currentPage < story.images.length - 1) {
@@ -43,6 +62,10 @@ return (
         <p className="story-text">{story.pages[currentPage - 1]}</p>
       </div>
     )}
+
+      <button onClick={handlePlayAudio} className="audio-button">
+        Play Audio
+      </button>
 
     {/* Navigation buttons */}
     <div className="navigation-buttons">
