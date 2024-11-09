@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const storyEndpoints = require('./story_endpoints');
 const dictEndpoints = require('./dict_endpoints');
