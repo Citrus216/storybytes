@@ -68,7 +68,30 @@ async function getImageUrl_getimgai(prompt, level) {
 //     }
 // })();
 
+const fs = require('fs');
+const path = require('path');
+
+async function fetchImage(id, name, url) {
+    const response = await fetch(url);
+    let bufferArray = []
+
+    for await (const chunk of response.body) {
+        bufferArray.push(chunk);
+    }
+
+    const buffer = Buffer.concat(bufferArray);
+
+    //write buffer to file with name the same as the image name
+    const fileName = path.join('temp', id, name);
+    
+    // Make all directories in the path if they do not exist
+    fs.mkdirSync(path.dirname(fileName), { recursive: true });
+
+    fs.writeFileSync(fileName, buffer);
+}
+
 module.exports = {
     getImageUrl,
-    getImageUrl_getimgai
+    getImageUrl_getimgai,
+    fetchImage
 };
