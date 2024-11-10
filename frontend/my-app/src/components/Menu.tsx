@@ -13,7 +13,7 @@ export function Menu() {
 
     const handleNavigate = (path: string) => {
         navigate(path);
-        setIsOpen(false); // Close menu after navigation
+        setIsOpen(false);
     };
 
     const onDragEnd = (result: any) => {
