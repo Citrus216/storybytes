@@ -7,7 +7,7 @@ import './Menu.css'
 
 export function Menu() {
    const [isOpen, setIsOpen] = useState(false);
-   const { stories, setStories } = useStories();
+   const { stories, setStories, removeStory } = useStories();
    const navigate = useNavigate();
 
 
@@ -67,6 +67,15 @@ export function Menu() {
                                                  className="story-item menu-link"
                                              >
                                                  {story.name}
+                                                 <span
+                                                    className="delete-button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevents triggering navigation
+                                                        removeStory(story.name); // Calls remove function
+                                                    }}
+                                                    >
+                                                    &times;
+                                                </span>
                                              </li>
                                          )}
                                      </Draggable>

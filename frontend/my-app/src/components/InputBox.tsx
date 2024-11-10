@@ -76,7 +76,9 @@ export function InputBox({ onSubmit, setLoading, age, poemMode, setError}: Input
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyPress}
             />
-            <button onClick={performSearch} className="button" >Search</button>
+            <button onClick={performSearch} className="button" >
+              <i className="fas fa-search"></i>
+            </button>
         </div>
     );
 }
