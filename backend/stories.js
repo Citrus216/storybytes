@@ -7,7 +7,7 @@ const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const { textToSpeech, textToSpeechElevenLabs } = require('./audio.js');
-const { getImageUrl, getImageUrl_getimgai, fetchImage } = require('./images');
+const { getImageUrl, getImageUrl_getimgai, getImageUrl_bfl, fetchImage } = require('./images');
 const uuid = require('uuid');
 
 
@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 10 plot points. Include multiple characters.`}
+        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 6 plot points. Include multiple characters.`}
     ],
     response_format: {
       type: "json_schema",
@@ -74,7 +74,6 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   const step1Output = step1.choices[0].message.content;
   const outline = JSON.parse(step1Output);
-  console.log(outline);
 
   const step2Promises = [];
   step2Promises.push(
@@ -142,7 +141,6 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   const step2Outputs = await Promise.all(step2Promises);
   const pages = step2Outputs.map((output) => JSON.parse(output.choices[0].message.content));
-  console.log(pages);
 
   //construct output object
   const jsonContent = {
@@ -250,9 +248,9 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
         fetchImage(storyId, `page${index}.jpg`, image);
       }, 
       (error) => {
-        getImage = getFreeImage;
+        console.error(error);
         imagePromises.push(
-          getImage(storyItem.image_description).then((image) => {
+          getFreeImage(storyItem.image_description).then((image) => {
             jsonContent.story[index].image = image;
           })
         );
@@ -293,7 +291,8 @@ const getFreeImage = async (prompt) => {
 
 const getPaidImage = async (prompt) => {
   //return await getImageUrl(prompt);
-  return await getImageUrl_getimgai(prompt);
+  // return await getImageUrl_getimgai(prompt);
+  return await getImageUrl_bfl(prompt);
 }
 
 module.exports = {
