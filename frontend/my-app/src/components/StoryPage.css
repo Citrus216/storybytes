@@ -1,4 +1,4 @@
-.story-container {
+/* .story-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,4 +19,47 @@
     margin-bottom: 10px;
     border-radius: 10px;
     text-align: center;
-}
+} */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+ }
+ 
+ 
+ .story-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: url('./background-2.png');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100vh;
+    margin-top: 0;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+    z-index: 1;
+ }
+ 
+ 
+ .view {
+    margin-top: 5px;
+ }
+ 
+ 
+ .story-title {
+    font-family: 'Lobster';
+    font-size: 50px;
+    font-weight: bold;
+    color: #545454;
+    padding: 0px 25px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
+ }
+ 
