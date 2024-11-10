@@ -21,19 +21,24 @@ app.use('/api/v1', dictEndpoints);
 
 // Prompt user for run type
 function promptRunType() {
-    console.log('Please enter "f" for free run or "p" for paid run:');
+    console.log('Please enter "f" for free run, "c" for cheap run, or "e" for expensive run:');
     process.stdin.on('data', (data) => {
         const input = data.toString().trim().toLowerCase();
         if (input === 'f') {
             config.setRunType('free');
-            console.log('Run type set to free.');
+            console.log('Run type set to free. (Default Images, Free TTS)');
             startServer();
-        } else if (input === 'p') {
-            config.setRunType('paid');
-            console.log('Run type set to paid.');
+        } else if (input === 'c') {
+            config.setRunType('cheap');
+            console.log('Run type set to cheap. (GetImgAI Images, Free TTS)');
             startServer();
-        } else {
-            console.log('Invalid input. Please enter "f" or "p".');
+        } else if (input === 'e') {
+            config.setRunType('expensive');
+            console.log('Run type set to expensive. (GetImgAI Images, ElevenLabs TTS)');
+            startServer();
+        } 
+        else {
+            console.log('Invalid input. Please enter "f", "c", or "e".');
         }
     });
 }

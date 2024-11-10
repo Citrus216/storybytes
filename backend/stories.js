@@ -6,7 +6,7 @@
 const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
-const { textToSpeech } = require('./audio.js');
+const { textToSpeech, textToSpeechElevenLabs } = require('./audio.js');
 const { getImageUrl, getImageUrl_getimgai } = require('./images');
 const uuid = require('uuid');
 
@@ -16,7 +16,7 @@ const path = require('path');
 // load image urls from default_images.json
 const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_images.json')));
 
-const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
+const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   if (level === undefined) {
     level = 12;
   }
@@ -139,18 +139,11 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
   const jsonContent = JSON.parse(step2.choices[0].message.content);
   jsonContent.uuid = uuid.v4();
 
-  // generate audio files for tts for title and then each page
-  textToSpeech(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
-  jsonContent.cover.audio = `${jsonContent.uuid}/title.mp3`;
-  for(let i = 0; i < jsonContent.story.length; i++) {
-    textToSpeech(jsonContent.story[i].text, `${jsonContent.uuid}/page${i}.mp3`);
-    jsonContent.story[i].audio = `${jsonContent.uuid}/page${i}.mp3`;
-  }
 
   // Create an array of promises for the cover and story images
   const imagePromises = [];
 
-  const getImage = isFree ? getFreeImage : getPaidImage;
+  const getImage = (runType === "free") ? getFreeImage : getPaidImage;
 
   // Cover image promise
   imagePromises.push(
@@ -188,8 +181,25 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
     );
   });
 
-  // Wait for all promises to resolve
-  await Promise.all(imagePromises);
+
+  const tts = (runType !== "expensive" ) ? textToSpeech : textToSpeechElevenLabs;
+
+  // generate audio files for tts for title and then each page
+  await tts(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
+  await tts(jsonContent.story[0].text, `${jsonContent.uuid}/page0.mp3`);
+  // Assumes there is at least one page
+  jsonContent.cover.audio = `${jsonContent.uuid}/title.mp3`;
+  jsonContent.story[0].audio = `${jsonContent.uuid}/page0.mp3`;
+
+  for(let i = 1; i < jsonContent.story.length; i++) {
+    jsonContent.story[i].audio = `${jsonContent.uuid}/page${i}.mp3`;
+  }
+
+  (async () => {
+    for(let i = 1; i < jsonContent.story.length; i++) {
+      await tts(jsonContent.story[i].text, `${jsonContent.uuid}/page${i}.mp3`);
+    }
+  })();
 
   return jsonContent;
 }
