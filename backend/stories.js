@@ -18,7 +18,7 @@ const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_i
 
 const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   if (level === undefined) {
-    level = 12;
+    level = "5th";
   }
   const step1 = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -213,21 +213,19 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   const imagePromises = [];
   const crucialImagePromises = [];
 
-  const getImage = (runType === "free") ? getFreeImage : getPaidImage;
+  const getImage = (runType === "free") ? getFreeImage : ((runType === "cheap") ? getPaidImage : getImageUrl_bfl);
 
   const storyId = jsonContent.uuid;
 
   jsonContent.cover.image = path.join(storyId, `cover.jpg`);
   // Cover image promise
   imagePromises.push(
-    getImage(jsonContent.cover.image_description).then(async (image) => {
+    getImage(jsonContent.cover.image_description, level).then(async (image) => {
       await fetchImage(storyId, `cover.jpg`, image);
     })
   );
   crucialImagePromises.push(imagePromises[0]);
 
-  // build all image descriptions:
-  let allImageDescriptions = [];
   jsonContent.story.forEach((storyItem, index) => {
     let includedCharacters = [];
     //remove punctuation and split storyItem.text by spaces
@@ -241,16 +239,15 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
       });
     });
     const completeDescription = `${includedCharacters.map(c => c.appearance).join(", ")}; ${storyItem.image_description}`;
-    allImageDescriptions.push(completeDescription);
     jsonContent.story[index].image = path.join(storyId, `page${index}.jpg`);
     imagePromises.push(
-      getImage(completeDescription).then((image) => {
+      getImage(completeDescription, level).then((image) => {
         fetchImage(storyId, `page${index}.jpg`, image);
       }, 
       (error) => {
         console.error(error);
         imagePromises.push(
-          getFreeImage(storyItem.image_description).then((image) => {
+          getFreeImage(storyItem.image_description, level).then((image) => {
             jsonContent.story[index].image = image;
           })
         );
@@ -259,7 +256,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   });
   crucialImagePromises.push(...imagePromises.slice(1, 3));
 
-  const tts = (runType !== "expensive" ) ? textToSpeech : textToSpeechElevenLabs;
+  const tts = (runType !== "expensive" && runType !== "super expensive") ? textToSpeech : textToSpeechElevenLabs;
 
   // generate audio files for tts for title and then each page
   await tts(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
@@ -285,14 +282,13 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
 let i = 0
 
-const getFreeImage = async (prompt) => {
+const getFreeImage = async (prompt, level) => {
   return image_urls[i++ % 11];
 }
 
-const getPaidImage = async (prompt) => {
+const getPaidImage = async (prompt, level) => {
   //return await getImageUrl(prompt);
-  // return await getImageUrl_getimgai(prompt);
-  return await getImageUrl_bfl(prompt);
+  return await getImageUrl_getimgai(prompt, level);
 }
 
 module.exports = {

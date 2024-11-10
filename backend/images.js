@@ -40,7 +40,7 @@ async function getImageUrl_getimgai(prompt, level) {
     //       response_format: 'url'
     //     })
     //   };
-    const url = 'https://api.getimg.ai/v1/flux-dev/text-to-image';
+    const url = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
     const options = {
         method: 'POST',
         headers: {accept: 'application/json', 'content-type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
