@@ -7,7 +7,7 @@ const OpenAI = require('openai');
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const { textToSpeech, textToSpeechElevenLabs } = require('./audio.js');
-const { getImageUrl, getImageUrl_getimgai } = require('./images');
+const { getImageUrl, getImageUrl_getimgai, fetchImage } = require('./images');
 const uuid = require('uuid');
 
 
@@ -142,17 +142,24 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   // Create an array of promises for the cover and story images
   const imagePromises = [];
+  const crucialImagePromises = [];
 
   const getImage = (runType === "free") ? getFreeImage : getPaidImage;
 
+  const storyId = jsonContent.uuid;
+
+
+  jsonContent.cover.image = path.join(storyId, `cover.jpg`);
   // Cover image promise
   imagePromises.push(
     getImage(jsonContent.cover.image_description).then((image) => {
-      jsonContent.cover.image = image;
+      fetchImage(storyId, `cover.jpg`, image);
     })
   );
+  crucialImagePromises.push(imagePromises[0]);
 
-  // Story images promises
+  // build all image descriptions:
+  let allImageDescriptions = [];
   jsonContent.story.forEach((storyItem, index) => {
     let includedCharacters = [];
     //remove punctuation and split storyItem.text by spaces
@@ -166,9 +173,11 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
       });
     });
     const completeDescription = `${includedCharacters.map(c => c.appearance).join(", ")}; ${storyItem.image_description}`;
+    allImageDescriptions.push(completeDescription);
+    jsonContent.story[index].image = path.join(storyId, `page${index}.jpg`);
     imagePromises.push(
       getImage(completeDescription).then((image) => {
-        jsonContent.story[index].image = image;
+        fetchImage(storyId, `page${index}.jpg`, image);
       }, 
       (error) => {
         getImage = getFreeImage;
@@ -180,7 +189,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
       })
     );
   });
-
+  crucialImagePromises.push(...imagePromises.slice(0, 2));
 
   const tts = (runType !== "expensive" ) ? textToSpeech : textToSpeechElevenLabs;
 
@@ -200,6 +209,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
       await tts(jsonContent.story[i].text, `${jsonContent.uuid}/page${i}.mp3`);
     }
   })();
+
+  await Promise.all(crucialImagePromises);
 
   return jsonContent;
 }
