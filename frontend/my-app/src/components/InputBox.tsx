@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 type InputBoxProps = {
     onSubmit: (url: string) => void;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>; 
 };
 
-export function InputBox({ onSubmit }: InputBoxProps) {
+export function InputBox({ onSubmit, setLoading }: InputBoxProps) {
     const [queryText, setQuery] = useState('');
     const { addStory } = useStories();
     const navigate = useNavigate();
@@ -33,12 +34,16 @@ export function InputBox({ onSubmit }: InputBoxProps) {
             })
             .catch(error => {
                 console.error('Error fetching search results:', error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
         onSubmit(url);
     };
 
     const performSearch = () => {
         constructEndpoint(queryText);
+        setLoading(true)
     };
 
     return (
