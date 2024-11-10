@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import ReactDOM from "react-dom";
 
 import './HomePage.css'
 
@@ -32,14 +33,16 @@ export function LoadingOverlay () {
 
   
 
-  return (
+  return ReactDOM.createPortal(
     <div className="loading-overlay">
       <img
         src={loadingGif}
         alt="Loading"
         className="loading-image"
+        draggable="false"
       />
       <div className={`loading-message ${isFading ? 'fade-out' : 'fade-in'}`}>{loadingMessage}</div>
-    </div>
+    </div>,
+    document.body
   );
 };

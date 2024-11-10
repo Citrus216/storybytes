@@ -21,7 +21,7 @@ app.use('/api/v1', dictEndpoints);
 
 // Prompt user for run type
 function promptRunType() {
-    console.log('Please enter "f" for free run, "c" for cheap run, or "e" for expensive run:');
+    console.log('Please enter "f" for free run, "c" for cheap run,  "e" for expensive run, or "se" for super expensive run:');
     process.stdin.on('data', (data) => {
         const input = data.toString().trim().toLowerCase();
         if (input === 'f') {
@@ -34,11 +34,15 @@ function promptRunType() {
             startServer();
         } else if (input === 'e') {
             config.setRunType('expensive');
-            console.log('Run type set to expensive. (GetImgAI Images, ElevenLabs TTS)');
+            console.log('Run type set to expensive. (BFL Images, Free TTS)');
+            startServer();
+        } else if (input === 'se') {
+            config.setRunType('super expensive');
+            console.log('Run type set to expensive. (BFL Images, ElevenLabs TTS)');
             startServer();
         } 
         else {
-            console.log('Invalid input. Please enter "f", "c", or "e".');
+            console.log('Invalid input. Please enter "f", "c", "e", or "se".');
         }
     });
 }
@@ -61,24 +65,24 @@ function deleteTemp() {
     fs.rmSync(storyPath, {recursive: true, force: true});
 }
 
-// Listen for termination signals
-process.on('SIGINT', () => {
-    console.log('Received SIGINT. Cleaning up...');
-    deleteTemp();
-    process.exit();
-});
+// // Listen for termination signals
+// process.on('SIGINT', () => {
+//     console.log('Received SIGINT. Cleaning up...');
+//     deleteTemp();
+//     process.exit();
+// });
 
-process.on('SIGTERM', () => {
-    console.log('Received SIGTERM. Cleaning up...');
-    deleteTemp();
-    process.exit();
-});
+// process.on('SIGTERM', () => {
+//     console.log('Received SIGTERM. Cleaning up...');
+//     deleteTemp();
+//     process.exit();
+// });
 
-// Optionally, handle unexpected exits
-process.on('exit', (code) => {
-    console.log(`Process exited with code: ${code}. Cleaning up...`);
-    deleteTemp();
-});
+// // Optionally, handle unexpected exits
+// process.on('exit', (code) => {
+//     console.log(`Process exited with code: ${code}. Cleaning up...`);
+//     deleteTemp();
+// });
 
 // Prompt for run type on startup
 promptRunType();
