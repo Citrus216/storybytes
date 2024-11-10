@@ -6,15 +6,12 @@
 }
 
 .story-title {
-    font-family:'Times New Roman', Times, serif;
-    font-size: 36px;
+    font-family: 'Great Vibes', cursive;
+    font-size: 60px;
     font-weight: bold;
-    color: #333;
+    color: #672400;
     padding: 15px 25px;
-    margin-bottom: 20px;
-
+    margin-bottom: 10px;
     border-radius: 10px;
-    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.25);
-    background-color: #f7f7f7;
     text-align: center;
 }
