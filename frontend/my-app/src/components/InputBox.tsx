@@ -60,6 +60,12 @@ export function InputBox({ onSubmit, setLoading, age, poemMode, setError}: Input
         setLoading(true);
     };
 
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+          performSearch();
+      }
+    };
+
     return (
         <div className="container">
             <input
@@ -68,6 +74,7 @@ export function InputBox({ onSubmit, setLoading, age, poemMode, setError}: Input
                 placeholder="Enter story prompt..."
                 value={queryText}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyPress}
             />
             <button onClick={performSearch} className="button" >Search</button>
         </div>

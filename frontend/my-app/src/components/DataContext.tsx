@@ -38,26 +38,26 @@ const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesStat
 
 const StoriesProvider = ({ children }: { children: ReactNode }) => {
     //delete
-    const initialStories = () => {
-        const storedStories = localStorage.getItem('stories');
-        if (storedStories) {
-          try {
-            return { stories: JSON.parse(storedStories) };
-          } catch (e) {
-            console.error("Failed to parse stories from localStorage", e);
-            return { stories: [] }; // Fallback to an empty array if parsing fails
-          }
-        }
-        return { stories: [] };
-      };
+    // const initialStories = () => {
+    //     const storedStories = localStorage.getItem('stories');
+    //     if (storedStories) {
+    //       try {
+    //         return { stories: JSON.parse(storedStories) };
+    //       } catch (e) {
+    //         console.error("Failed to parse stories from localStorage", e);
+    //         return { stories: [] }; // Fallback to an empty array if parsing fails
+    //       }
+    //     }
+    //     return { stories: [] };
+    //   };
       //delete
 
-  //const [state, dispatch] = useReducer(storiesReducer, { stories: [] });
-  const [state, dispatch] = useReducer(storiesReducer, initialStories());
+  const [state, dispatch] = useReducer(storiesReducer, { stories: [] });
+  //const [state, dispatch] = useReducer(storiesReducer, initialStories());
 
   // Load stories from session storage when the app starts
   useEffect(() => {
-    const storedStories = localStorage.getItem('stories');
+    const storedStories = sessionStorage.getItem('stories');
     if (storedStories) {
       dispatch({ type: 'SET_STORIES', stories: JSON.parse(storedStories) });
     }
@@ -65,7 +65,7 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
 
   // Save stories to session storage whenever they change
   useEffect(() => {
-    localStorage.setItem('stories', JSON.stringify(state.stories));
+    sessionStorage.setItem('stories', JSON.stringify(state.stories));
   }, [state.stories]);
 
   const addStory = (story: Story) => {
