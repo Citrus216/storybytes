@@ -65,7 +65,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
               }
             }
           },
-          required: ["title", "characters", "setting", "conflict", "resolution", "plot_points"],
+          required: ["title", "characters", "plot_points"],
           additionalProperties: false
         }
       }
