@@ -5,7 +5,7 @@ function getRunType() {
 }
 
 function setRunType(type) {
-    if (type === 'free' || type === 'paid') {
+    if (type === 'free' || type === 'cheap' || type === 'expensive') {
         runType = type;
     }
 }

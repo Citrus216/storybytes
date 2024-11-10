@@ -16,7 +16,7 @@ const path = require('path');
 // load image urls from default_images.json
 const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_images.json')));
 
-const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
+const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   if (level === undefined) {
     level = 3;
   }
@@ -74,7 +74,7 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
   // Create an array of promises for the cover and story images
   const imagePromises = [];
 
-  const getImage = isFree ? getFreeImage : getPaidImage;
+  const getImage = (runType === "free") ? getFreeImage : getPaidImage;
 
   // Cover image promise
   imagePromises.push(
@@ -101,7 +101,7 @@ const generateStoryText = async (prompt, level, poemMode, isFree = true) => {
   });
 
 
-  const tts = isFree ? textToSpeech : textToSpeechElevenLabs;
+  const tts = (runType !== "expensive" ) ? textToSpeech : textToSpeechElevenLabs;
 
   // generate audio files for tts for title and then each page
   await tts(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
