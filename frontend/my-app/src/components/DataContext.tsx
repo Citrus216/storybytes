@@ -11,6 +11,8 @@ interface StoriesState {
   stories: Story[];
 }
 
+console.log(localStorage);
+
 type StoriesAction =
   | { type: 'ADD_STORY'; story: Story }
   | { type: 'REMOVE_STORY'; name: string }
@@ -37,11 +39,29 @@ const storiesReducer = (state: StoriesState, action: StoriesAction): StoriesStat
 };
 
 const StoriesProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(storiesReducer, { stories: [] });
+    //delete
+    const initialStories = () => {
+        const storedStories = localStorage.getItem('stories');
+        console.log("STORIES:")
+        console.log(localStorage.getItem('stories'));
+        if (storedStories) {
+          try {
+            return { stories: JSON.parse(storedStories) };
+          } catch (e) {
+            console.error("Failed to parse stories from localStorage", e);
+            return { stories: [] }; // Fallback to an empty array if parsing fails
+          }
+        }
+        return { stories: [] };
+      };
+      //delete
+
+  //const [state, dispatch] = useReducer(storiesReducer, { stories: [] });
+  const [state, dispatch] = useReducer(storiesReducer, initialStories());
 
   // Load stories from session storage when the app starts
   useEffect(() => {
-    const storedStories = sessionStorage.getItem('stories');
+    const storedStories = localStorage.getItem('stories');
     if (storedStories) {
       dispatch({ type: 'SET_STORIES', stories: JSON.parse(storedStories) });
     }
@@ -49,11 +69,12 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
 
   // Save stories to session storage whenever they change
   useEffect(() => {
-    sessionStorage.setItem('stories', JSON.stringify(state.stories));
+    localStorage.setItem('stories', JSON.stringify(state.stories));
   }, [state.stories]);
 
   const addStory = (story: Story) => {
     dispatch({ type: 'ADD_STORY', story });
+    console.log(localStorage);
   };
 
   const removeStory = (name: string) => {

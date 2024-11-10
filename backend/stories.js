@@ -18,13 +18,81 @@ const image_urls = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'default_i
 
 const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   if (level === undefined) {
-    level = 3;
+    level = 12;
   }
-  const gptResponse = await openai.chat.completions.create({
+  const step1 = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are ${poemMode ? "a poet writing a poem" : "an author writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
+        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}".`}
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "outline_schema",
+        schema: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string"
+            },
+            characters: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    description: "Creative first name for the character, with surname if applicable"
+                  },
+                  personality: {
+                    type: "string",
+                    description: "Complete and thorough description of the character's personality"
+                  },
+                  appearance: {
+                    type: "string",
+                    description: "Complete and thorough description of the character's appearance"
+                  }
+                }
+              },
+              description: "Complete and thorough description of all the characters' appearance and personality"
+            },
+            setting: {
+              type: "string",
+              description: "Complete description of when and where the story takes place, including all relevant details"
+            },
+            conflict: {
+              type: "string",
+              description: "The main problem or struggle that the characters face in the story"
+            },
+            resolution: {
+              type: "string",
+              description: "How the characters solve the main problem or struggle in the story"
+            },
+            plot_points: {
+              type: "array",
+              items: {
+                type: "string",
+                description: "A key event in the story that moves the plot forward"
+              }
+            }
+          },
+          required: ["title", "characters", "setting", "conflict", "resolution"],
+          additionalProperties: false
+        }
+      }
+    }
+  });
+
+  const step1Output = step1.choices[0].message.content;
+  const outline = JSON.parse(step1Output);
+  console.log(outline);
+
+  const step2 = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+        {"role": "user", "content": step1Output},
+        {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
@@ -41,7 +109,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
                         type: "string"
                       },
                       image_description: {
-                        type: "string"
+                        type: "string",
+                        description: "Complete and thorough description of the image for the cover, using the character and setting descriptions from the outline."
                       }
                     }
                   },
@@ -54,7 +123,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
                           type: "string"
                         },
                         image_description: {
-                          type: "string"
+                          type: "string",
+                          description: "Complete and thorough description of the image for the page, using the character and setting descriptions from the outline."
                         }
                       },
                       required: ["text", "image_description"]
@@ -66,9 +136,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
         }
     }
   });
-  const jsonContent = JSON.parse(gptResponse.choices[0].message.content);
+  const jsonContent = JSON.parse(step2.choices[0].message.content);
   jsonContent.uuid = uuid.v4();
-
 
 
   // Create an array of promises for the cover and story images
@@ -85,8 +154,20 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   // Story images promises
   jsonContent.story.forEach((storyItem, index) => {
+    let includedCharacters = [];
+    //remove punctuation and split storyItem.text by spaces
+    const words = storyItem.text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ');
+    //find all words that are included in the character names
+    words.forEach((word) => {
+      outline.characters.forEach((character) => {
+        if (word.toLowerCase() === character.name.toLowerCase() && !includedCharacters.includes(character)) {
+          includedCharacters.push(character);
+        }
+      });
+    });
+    const completeDescription = `${includedCharacters.map(c => c.appearance).join(", ")}; ${storyItem.image_description}`;
     imagePromises.push(
-      getImage(storyItem.image_description).then((image) => {
+      getImage(completeDescription).then((image) => {
         jsonContent.story[index].image = image;
       }, 
       (error) => {

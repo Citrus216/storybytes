@@ -47,4 +47,52 @@
     background-color: transparent; 
     border: none; 
     padding: 0;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: none;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.loading-image {
+    width: 550px; 
+    height: 550px; 
+    object-fit: contain;
+    pointer-events: auto;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+.loading-message {
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    margin-top: -60px;
+    transition: opacity 1s ease-in-out;
+}
+
+.home-container.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.fade-out {
+    opacity: 0;
+  }
+  
+  .fade-in {
+    opacity: 1;
   }
