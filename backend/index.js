@@ -35,6 +35,7 @@ function promptRunType() {
         } else if (input === 'e') {
             config.setRunType('expensive');
             console.log('Run type set to expensive. (BFL Images, Free TTS)');
+            startServer();
         } else if (input === 'se') {
             config.setRunType('super expensive');
             console.log('Run type set to expensive. (BFL Images, ElevenLabs TTS)');

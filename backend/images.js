@@ -95,7 +95,7 @@ async function getImageUrl_bfl(prompt, level) {
             }
         });
         getData = await getResponse.json();
-        if (getData.status === 'Pending') {
+        if (getData.status !== 'Ready') {
             await new Promise(resolve => setTimeout(resolve, timeout));
             timeout += 500;
         } else {
