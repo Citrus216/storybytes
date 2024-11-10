@@ -28,9 +28,22 @@
         opacity: 1;
     }
  }
+
+ .background-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('./background-2.png');
+    background-size: cover;
+    background-position: center;
+    z-index: -10000; /* Place it behind everything else */
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
  
- 
- .story-container {
+ /* .story-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,8 +56,20 @@
     opacity: 0;
     animation: fadeIn 0.5s ease-in forwards;
     z-index: 1;
- }
- 
+ } */
+
+ .story-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin-top: 80px;
+    z-index: 100; /* Keep above background */
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
  
  .view {
     margin-top: 5px;

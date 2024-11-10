@@ -21,15 +21,17 @@ const StoryPage: React.FC<StoryPageProps> = ({ story }) => {
        return () => clearTimeout(timeout); // Cleanup timeout on unmount
    }, [story]);
 
-
    return (
-       <div className={`story-container ${fadeIn ? 'fade-in' : ''}`}>
-         <h1 className="story-title">{story.name}</h1>
-         <div className="view">
-           <Viewer story={story} />
-         </div>
-       </div>
-   );
+    <>
+        <div className={`background-wrapper ${fadeIn ? 'fade-in' : ''}`}></div>
+        <div className="story-container">
+            <h1 className="story-title">{story.name}</h1>
+            <div className="view">
+                <Viewer story={story} />
+            </div>
+        </div>
+    </>
+);
 };
 
 export default StoryPage;

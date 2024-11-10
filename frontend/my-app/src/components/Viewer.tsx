@@ -39,11 +39,6 @@ useEffect(() => {
 }, []);
 
 
-console.log(backgroundColor);
-console.log(borderColor);
-console.log(buttonColor);
-
-
 useEffect(() => {
  if (story.audios && story.audios[currentPage]) {
   const newAudio = new Audio(`http://localhost:8080/files/${story.audios[currentPage]}`);
