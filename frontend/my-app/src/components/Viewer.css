@@ -2,16 +2,18 @@
     margin-top: 1rem;
     display: flex;
     min-width: 1000px;
-}
-
-.story-page {
+ }
+ 
+ 
+ .story-page {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-.img-text-housing {
+ }
+ 
+ 
+ .img-text-housing {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -24,23 +26,26 @@
     border-radius: 40px;
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     background-color: antiquewhite;
-}
-
-.navigation-buttons {
+ }
+ 
+ 
+ .navigation-buttons {
     margin-top: -60px;
     display: flex;
     width: 800px;
     justify-content: space-between;
-}
-
-.cover-page {
+ }
+ 
+ 
+ .cover-page {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-.cover-housing {
+ }
+ 
+ 
+ .cover-housing {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -53,18 +58,20 @@
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     border-radius: 40px;
     background-color: antiquewhite;
-}
-
-.full-width-image {
+ }
+ 
+ 
+ .full-width-image {
     width: 380px;
     margin-top: 20px;
     margin-bottom: 55px;
     border: 2px solid rgb(138, 85, 0);
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     border-radius: 10%;
-}
-
-.story-image {
+ }
+ 
+ 
+ .story-image {
     width: 380px;
     margin-top: 50px;
     margin-bottom: 100px;
@@ -72,9 +79,10 @@
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     border: 1px solid rgb(138, 85, 0);
     border-radius: 10%;
-}
-
-.story-text {
+ }
+ 
+ 
+ .story-text {
     width: 350px;
     padding: 0 1rem;
     font-family: 'Libre Baskerville', serif;
@@ -84,8 +92,8 @@
     color: #3d3d3d;
     text-align: justify;
     padding: 0 1.5rem;
-    letter-spacing: 0.02em; 
-    text-indent: 1em; 
+    letter-spacing: 0.02em;
+    text-indent: 1em;
     background-color: rgba(255, 239, 213, 0.5);
     padding: 1rem;
     border-radius: 8px;
@@ -96,9 +104,10 @@
     margin-left: 20px;
     height: 350px;
     overflow: auto;
-}
-
-.audio-button {
+ }
+ 
+ 
+ .audio-button {
     position: fixed;
     top: 1rem;
     right: 1rem;
@@ -115,14 +124,16 @@
     font-size: 1.2rem;
     transition: background-color 0.3s, transform 0.2s;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.audio-button:hover {
+ }
+ 
+ 
+ .audio-button:hover {
     background-color: #218838;
     transform: scale(1.1);
-}
-
-.next-button {
+ }
+ 
+ 
+ .next-button {
     background-color: #977400;
     color: #fff;
     border: none;
@@ -130,16 +141,18 @@
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     height: 30px;
     width: 30px;
-}
-
-.next-button:hover {
+ }
+ 
+ 
+ .next-button:hover {
     background-color: #ff00d4;
     transform: scale(1.1);
     box-shadow: 0px 0px 15px rgba(88, 88, 88, 0.554);
     transition: background-color 0.3s, transform 0.2s;
-}
-
-.prev-button {
+ }
+ 
+ 
+ .prev-button {
     background-color: #977400;
     color: #fff;
     border: none;
@@ -148,18 +161,76 @@
     width: 30px;
     box-shadow: 0px 0px 10px rgba(88, 88, 88, 0.554);
     transition: background-color 0.3s, transform 0.2s;
-}
-
-.prev-button:hover {
+ }
+ 
+ 
+ .prev-button:hover {
     background-color: #ff00cc;
     box-shadow: 0px 0px 15px rgba(88, 88, 88, 0.554);
     transform: scale(1.1);
-}
-
-.page-counter {
+ }
+ 
+ 
+ .page-counter {
     font-family: 'Arial', sans-serif;
     font-size: 1rem;
     color: #333;
     font-weight: bold;
     margin-top: 5px;
-}
+ }
+ 
+ 
+ .clickable-word {
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+   .clickable-word:hover {
+    color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+  }
+ 
+ 
+  /* Dark overlay background */
+ .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Make sure it appears above other elements */
+  }
+   /* Modal container */
+  .definition-modal {
+    background-color: #ffeacb;
+    border: 2px solid rgb(120, 68, 0);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 80%;
+    text-align: center;
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.54);
+    z-index: 1001;
+    position: relative;
+    padding: 10px 40px 40px;
+  }
+   .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s ease;
+  }
+ 
+  .close-button:hover {
+    color: #ff0000;
+  }
