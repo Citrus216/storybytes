@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useStories } from "./DataContext";
 import { useNavigate } from 'react-router-dom';
+
 //import './HomePage.css'
 
 type InputBoxProps = {
@@ -9,9 +10,10 @@ type InputBoxProps = {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     age: string;
     poemMode: boolean;
+    setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export function InputBox({ onSubmit, setLoading, age, poemMode}: InputBoxProps) {
+export function InputBox({ onSubmit, setLoading, age, poemMode, setError}: InputBoxProps) {
     const [queryText, setQuery] = useState('');
     const { addStory } = useStories();
     const navigate = useNavigate();
@@ -50,8 +52,12 @@ export function InputBox({ onSubmit, setLoading, age, poemMode}: InputBoxProps) 
     };
 
     const performSearch = () => {
+        if (age === "") {
+            setError("Please select an age group!");
+            return;
+        }
         constructEndpoint(queryText, age, poemMode);
-        setLoading(true)
+        setLoading(true);
     };
 
     return (

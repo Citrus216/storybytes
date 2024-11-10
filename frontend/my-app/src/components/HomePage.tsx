@@ -4,6 +4,7 @@ import {InputBox} from './InputBox';
 import {LoadingOverlay} from './LoadingOverlay';
 import {AgeDrop} from './AgeDrop';
 import {PoemMode} from './PoemMode';
+import Alert from "./Alert";
 import logo from "./storybytes-logo.png"
 import name from "./storybytes-name.png"
 
@@ -14,6 +15,7 @@ const HomePage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedAge, setSelectedAge] = useState<string>("");
     const [poemMode, setPoemMode] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
     const handleSearchSubmit = (url: string) => {
         console.log("URL received from InputBox:", url);
@@ -27,14 +29,19 @@ const HomePage: React.FC = () => {
         setPoemMode(!poemMode);
     };
 
+    const closeAlert = () => {
+        setError("");
+    };
+
     return (
         <div className={`home-container ${isLoading ? 'disabled' : ''}`}>
             <div className="homepage-images">
                 <img src={logo} alt="StoryBytes Logo" className="logo"></img>
                 <img src={name} alt="StoryBytes" className="title"></img>
             </div>
-            <InputBox onSubmit={handleSearchSubmit} setLoading={setIsLoading} age={selectedAge} poemMode={poemMode} />
-
+            <InputBox onSubmit={handleSearchSubmit} setLoading={setIsLoading} age={selectedAge} poemMode={poemMode}  setError={setError}/>
+            
+            {error && <Alert message={error} onClose={closeAlert} />}
             <div className="dropdown-and-poem-container">
                 <AgeDrop onSubmit={handleAgeSubmit}/>
                 <PoemMode onToggle={handlePoemModeToggle}/>
