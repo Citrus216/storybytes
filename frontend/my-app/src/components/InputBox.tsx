@@ -6,17 +6,25 @@ import { useNavigate } from 'react-router-dom';
 
 type InputBoxProps = {
     onSubmit: (url: string) => void;
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>; 
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    age: string;
+    poemMode: boolean;
 };
 
-export function InputBox({ onSubmit, setLoading }: InputBoxProps) {
+export function InputBox({ onSubmit, setLoading, age, poemMode}: InputBoxProps) {
     const [queryText, setQuery] = useState('');
     const { addStory } = useStories();
     const navigate = useNavigate();
 
-    const constructEndpoint = (queryText: string) => {
+    const constructEndpoint = (queryText: string, age: string, poemMode: boolean) => {
         const encodedQuery = encodeURIComponent(queryText);
-        const url = `http://localhost:8080/api/v1/story?q=${encodedQuery}`;
+        let url = `http://localhost:8080/api/v1/story?q=${encodedQuery}`;
+        if (age != "") {
+            url += `&level=${encodeURIComponent(age)}`;
+        }
+        if (poemMode == true) {
+            url += `&poemMode=true`;
+        }
 
         axios.get(url)
             .then(response => {
@@ -42,7 +50,7 @@ export function InputBox({ onSubmit, setLoading }: InputBoxProps) {
     };
 
     const performSearch = () => {
-        constructEndpoint(queryText);
+        constructEndpoint(queryText, age, poemMode);
         setLoading(true)
     };
 
