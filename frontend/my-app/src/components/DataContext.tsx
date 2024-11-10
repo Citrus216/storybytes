@@ -11,8 +11,6 @@ interface StoriesState {
   stories: Story[];
 }
 
-console.log(localStorage);
-
 type StoriesAction =
   | { type: 'ADD_STORY'; story: Story }
   | { type: 'REMOVE_STORY'; name: string }
@@ -42,8 +40,6 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
     //delete
     const initialStories = () => {
         const storedStories = localStorage.getItem('stories');
-        console.log("STORIES:")
-        console.log(localStorage.getItem('stories'));
         if (storedStories) {
           try {
             return { stories: JSON.parse(storedStories) };
@@ -74,7 +70,6 @@ const StoriesProvider = ({ children }: { children: ReactNode }) => {
 
   const addStory = (story: Story) => {
     dispatch({ type: 'ADD_STORY', story });
-    console.log(localStorage);
   };
 
   const removeStory = (name: string) => {
