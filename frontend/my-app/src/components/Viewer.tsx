@@ -118,7 +118,7 @@ useEffect(() => {
 }, [currentPage, audio, handleNext, handlePrevious, handlePlayAudio]);
 
 return (
-   <div className="story-container">
+   <div className="story-div">
      {currentPage === 0 ? (
        // First page: display the first image as cover
        <div className="cover-page">
