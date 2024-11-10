@@ -30,19 +30,20 @@
 .button {
     padding: 10px 20px;
     font-size: 16px;
+    color: #545454;
     box-shadow: 0px 4px 8px rgba(30, 30, 30, 0.2);
-    border: 1px solid rgb(183, 180, 180);
-    border-radius: 15px;
+    border: 2px solid rgb(183, 180, 180);
+    border-radius: 5px;
+    height: 65px;
+    margin-left: -10px;
 }
 
 .button:hover{
-    transform: scale(1.1);
     background-color: #E1D2F0;
-    border-color: #E1D2F0;
 }
 
 .search-icon {
-    font-size: 50px;
+    font-size: 60px;
     border-radius: 50%;
     background-color: rgb(198, 202, 200);
     height: 70%;
