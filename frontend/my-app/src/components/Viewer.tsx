@@ -8,6 +8,7 @@ interface StoryDisplayProps {
 
 const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
  const [currentPage, setCurrentPage] = useState(0);
+ const [currentAudio, setCurrentAudio] = useState(0);
  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
  useEffect(() => {
@@ -15,11 +16,12 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
     const newAudio = new Audio(`http://localhost:8080/files/${story.audios[currentPage]}`);
     newAudio.onloadeddata = () => {
       setAudio(newAudio);
+      setCurrentAudio(currentPage);
     };
    }
  }, [currentPage, story.audios]);
 
- useEffect(() => {
+useEffect(() => {
   return () => {
     if (audio) {
       audio.pause();
@@ -28,9 +30,13 @@ const Viewer: React.FC<StoryDisplayProps> = ({ story }) => {
   };
 }, [audio]);
 
- const handlePlayAudio = () => {
-  if (audio) {
-    audio.play();
+const handlePlayAudio = () => {
+  if (audio && currentPage == currentAudio) {
+    if (audio.paused) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
   }
 };
 
@@ -51,6 +57,25 @@ const handlePrevious = () => {
     setCurrentPage(currentPage - 1);
   }
 };
+
+useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      handleNext();
+    } else if (event.key === 'ArrowLeft') {
+      handlePrevious();
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      handlePlayAudio();
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, [currentPage, audio, handleNext, handlePrevious, handlePlayAudio]);
+
 
 return (
     <div className="story-container">
