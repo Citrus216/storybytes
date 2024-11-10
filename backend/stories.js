@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}".`}
+        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 10 plot points. Include multiple characters.`}
     ],
     response_format: {
       type: "json_schema",
@@ -57,27 +57,15 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
               },
               description: "Complete and thorough description of all the characters' appearance and personality"
             },
-            setting: {
-              type: "string",
-              description: "Complete description of when and where the story takes place, including all relevant details"
-            },
-            conflict: {
-              type: "string",
-              description: "The main problem or struggle that the characters face in the story"
-            },
-            resolution: {
-              type: "string",
-              description: "How the characters solve the main problem or struggle in the story"
-            },
             plot_points: {
               type: "array",
               items: {
                 type: "string",
-                description: "A key event in the story that moves the plot forward"
+                description: "Brief summary of each page in the story"
               }
             }
           },
-          required: ["title", "characters", "setting", "conflict", "resolution"],
+          required: ["title", "characters", "setting", "conflict", "resolution", "plot_points"],
           additionalProperties: false
         }
       }
@@ -88,56 +76,139 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   const outline = JSON.parse(step1Output);
   console.log(outline);
 
-  const step2 = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-        {"role": "user", "content": step1Output},
-        {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
-    ],
-    response_format: {
-        // See /docs/guides/structured-outputs
+  const step2Promises = [];
+  step2Promises.push(
+    openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+          {"role": "user", "content": step1Output},
+          {"role": "system", "content": `You are creating a cover for the story. The cover should have an image description that includes all the characters' appearances. Do not include the characters' names in the description. Make it efficient and brief.`}
+      ],
+      response_format: {
         type: "json_schema",
         json_schema: {
-            name: "story_schema",
-            schema: {
-                type: "object",
-                properties: {
-                  cover: {
-                    type: "object",
-                    properties: {
-                      title: {
-                        type: "string"
-                      },
-                      image_description: {
-                        type: "string",
-                        description: "Complete and thorough description of the image for the cover, using the character and setting descriptions from the outline."
-                      }
-                    }
-                  },
-                  story: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        text: {
-                          type: "string"
-                        },
-                        image_description: {
-                          type: "string",
-                          description: "Complete and thorough description of the image for the page, using the character and setting descriptions from the outline."
-                        }
-                      },
-                      required: ["text", "image_description"]
-                    }
-                  }
-                },
-                additionalProperties: false
-            }
+          name: "cover_schema",
+          schema: {
+            type: "object",
+            properties: {
+              title: {
+                type: "string"
+              },
+              image_description: {
+                type: "string",
+                description: "Complete and thorough description of the image for the cover, using the character and setting descriptions from the outline"
+              }
+            },
+            required: ["title", "image_description"],
+            additionalProperties: false
+          }
         }
-    }
-  });
-  const jsonContent = JSON.parse(step2.choices[0].message.content);
-  jsonContent.uuid = uuid.v4();
+      }
+    })
+  );
+
+  for(let i = 0; i < outline.plot_points.length; i++) {
+    step2Promises.push(
+      openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            {"role": "user", "content": step1Output},
+            {"role": "system", "content": `You are an author writing page ${i + 1} of a ${poemMode ? "poem" : "story"} for grade ${level}, out of ${outline.plot_points.length}. ${i !== 0 ? `Previous page context: ${outline.plot_points[i]}` : ""} Current page context: ${outline.plot_points[i]} Do not number the page. Return ONLY the page's plain text in the text field. The page should have 3-4 sentences.`},
+            {"role": "system", "content": `Strictly create this for a child in grade: ${level}`}
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "page_schema",
+            schema: {
+              type: "object",
+              properties: {
+                text: {
+                  type: "string"
+                },
+                image_description: {
+                  type: "string",
+                  description: "Complete and thorough description of the image for the page, using the character and setting descriptions from the outline"
+                }
+              },
+              required: ["text", "image_description"],
+              additionalProperties: false
+            }
+          }
+        }
+      })
+    );
+  }
+
+  const step2Outputs = await Promise.all(step2Promises);
+  const pages = step2Outputs.map((output) => JSON.parse(output.choices[0].message.content));
+  console.log(pages);
+
+  //construct output object
+  const jsonContent = {
+    uuid: uuid.v4(),
+    cover: {
+      title: outline.title,
+      image_description: pages[0].image_description
+    },
+    story: pages.slice(1).map((page, index) => {
+      return {
+        text: page.text,
+        image_description: page.image_description
+      };
+    })
+  }
+
+  // const step2 = await openai.chat.completions.create({
+  //   model: "gpt-4o",
+  //   messages: [
+  //       {"role": "user", "content": step1Output},
+  //       {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages. Each page has 5 sentences.`}
+  //   ],
+  //   response_format: {
+  //       // See /docs/guides/structured-outputs
+  //       type: "json_schema",
+  //       json_schema: {
+  //           name: "story_schema",
+  //           schema: {
+  //               type: "object",
+  //               properties: {
+  //                 cover: {
+  //                   type: "object",
+  //                   properties: {
+  //                     title: {
+  //                       type: "string"
+  //                     },
+  //                     image_description: {
+  //                       type: "string",
+  //                       description: "Complete and thorough description of the image for the cover, using the character and setting descriptions from the outline."
+  //                     }
+  //                   }
+  //                 },
+  //                 story: {
+  //                   type: "array",
+  //                   items: {
+  //                     type: "object",
+  //                     properties: {
+  //                       text: {
+  //                         type: "string"
+  //                       },
+  //                       image_description: {
+  //                         type: "string",
+  //                         description: "Complete and thorough description of the image for the page, using the character and setting descriptions from the outline."
+  //                       }
+  //                     },
+  //                     required: ["text", "image_description"]
+  //                   }
+  //                 }
+  //               },
+  //               additionalProperties: false
+  //           }
+  //       }
+  //   }
+  // });
+  // const jsonContent = JSON.parse(step2.choices[0].message.content);
+  // jsonContent.uuid = uuid.v4();
 
 
   // Create an array of promises for the cover and story images
@@ -148,12 +219,11 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   const storyId = jsonContent.uuid;
 
-
   jsonContent.cover.image = path.join(storyId, `cover.jpg`);
   // Cover image promise
   imagePromises.push(
-    getImage(jsonContent.cover.image_description).then((image) => {
-      fetchImage(storyId, `cover.jpg`, image);
+    getImage(jsonContent.cover.image_description).then(async (image) => {
+      await fetchImage(storyId, `cover.jpg`, image);
     })
   );
   crucialImagePromises.push(imagePromises[0]);
@@ -189,7 +259,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
       })
     );
   });
-  crucialImagePromises.push(...imagePromises.slice(0, 2));
+  crucialImagePromises.push(...imagePromises.slice(1, 3));
 
   const tts = (runType !== "expensive" ) ? textToSpeech : textToSpeechElevenLabs;
 
