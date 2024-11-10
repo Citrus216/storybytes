@@ -4,6 +4,9 @@ import {InputBox} from './InputBox';
 import {LoadingOverlay} from './LoadingOverlay';
 import {AgeDrop} from './AgeDrop';
 import {PoemMode} from './PoemMode';
+import logo from "./storybytes-logo.png"
+import name from "./storybytes-name.png"
+
 import './HomePage.css'
 
 
@@ -26,7 +29,10 @@ const HomePage: React.FC = () => {
 
     return (
         <div className={`home-container ${isLoading ? 'disabled' : ''}`}>
-            <h1>StoryBytes</h1>
+            <div className="homepage-images">
+                <img src={logo} alt="StoryBytes Logo" className="logo"></img>
+                <img src={name} alt="StoryBytes" className="title"></img>
+            </div>
             <InputBox onSubmit={handleSearchSubmit} setLoading={setIsLoading} age={selectedAge} poemMode={poemMode} />
 
             <div className="dropdown-and-poem-container">
