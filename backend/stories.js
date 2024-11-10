@@ -114,7 +114,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
         messages: [
             {"role": "user", "content": step1Output},
             {"role": "system", "content": `You are an author writing page ${i + 1} of a ${poemMode ? "poem" : "story"} for grade ${level}, out of ${outline.plot_points.length}. ${i !== 0 ? `Previous page context: ${outline.plot_points[i]}` : ""} Current page context: ${outline.plot_points[i]} Do not number the page. Return ONLY the page's plain text in the text field. The page should have 3-4 sentences.`},
-            {"role": "system", "content": `Strictly create this for a child in grade: ${level}`}
+            {"role": "system", "content": `Strictly create this for a child in grade: ${level}. Make the content transition between the previous page and current page.`}
         ],
         response_format: {
           type: "json_schema",
