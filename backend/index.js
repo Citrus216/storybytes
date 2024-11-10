@@ -50,5 +50,35 @@ function startServer() {
     });
 }
 
+function deleteTemp() {
+    const fs = require('fs');
+    const path = require('path');
+
+    const storyPath = path.join(__dirname, 'temp');
+    if(!fs.existsSync(storyPath)) {
+        return
+    }
+    fs.rmSync(storyPath, {recursive: true, force: true});
+}
+
+// Listen for termination signals
+process.on('SIGINT', () => {
+    console.log('Received SIGINT. Cleaning up...');
+    deleteTemp();
+    process.exit();
+});
+
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM. Cleaning up...');
+    deleteTemp();
+    process.exit();
+});
+
+// Optionally, handle unexpected exits
+process.on('exit', (code) => {
+    console.log(`Process exited with code: ${code}. Cleaning up...`);
+    deleteTemp();
+});
+
 // Prompt for run type on startup
 promptRunType();
