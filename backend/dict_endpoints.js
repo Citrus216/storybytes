@@ -9,9 +9,12 @@ router.get('/dict', async (req, res) => {
     return res.status(400).send('Word query parameter is required');
   }
 
+  // Remove all punctuation from the word
+  const sanitizedWord = word.replace(/[^\w\s]|_/g, "").replace(/\s+/g, "");
+
   try {
     // Send a request to the DictionaryAPI.dev API with the word parameter
-    const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${sanitizedWord}`);
 
     // Extract data and map it to the simplified structure
     const data = response.data[0]; // Get the first entry
