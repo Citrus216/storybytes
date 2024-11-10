@@ -61,7 +61,7 @@ async function getImageUrl_getimgai(prompt, level) {
 const bflApiKey = process.env.BFL_API_KEY;
 
 async function getImageUrl_bfl(prompt, level) {
-    const styledPrompt = `In the style of a story illustration appropriate for grade ${level}: ${prompt}`;
+    const styledPrompt = `A cartoon story illustration appropriate for children in ${level} grade of ${prompt}`;
     const url = 'https://api.bfl.ml/v1/flux-pro-1.1';
     const genResponse = await fetch(url, {
         method: 'POST',

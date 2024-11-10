@@ -24,7 +24,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 6 plot points. Include multiple characters.`}
+        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 10 plot points. Include multiple characters.`}
     ],
     response_format: {
       type: "json_schema",
