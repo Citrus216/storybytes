@@ -84,7 +84,7 @@ return (
         <div className="cover-page">
           <div className="cover-housing">
             <img
-              src={story.images[0]}
+              src={`http://localhost:8080/files/${story.images[0]}`}
               alt={`Cover Page`}
               className="full-width-image"
             />
@@ -112,7 +112,7 @@ return (
         <div className="story-page">
           <div className="img-text-housing">
             <img
-              src={story.images[currentPage]}
+              src={`http://localhost:8080/files/${story.images[currentPage]}`}
               alt={`Page ${currentPage + 1}`}
               className="story-image"
             />
