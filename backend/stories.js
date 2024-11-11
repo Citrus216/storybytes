@@ -36,6 +36,10 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
             title: {
               type: "string"
             },
+            language: {
+              type: "string",
+              description: "Name of the language that the story should be written in, based on the input prompt's language and content, written in that language"
+            },
             characters: {
               type: "array",
               items: {
@@ -74,6 +78,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
 
   const step1Output = step1.choices[0].message.content;
   const outline = JSON.parse(step1Output);
+  console.log(outline);
 
   // const step2Promises = [];
   // step2Promises.push(
@@ -161,7 +166,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": step1Output},
-        {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages, with each page based on one plot point in the outline provided. Each page has 5 sentences.`}
+        {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages, with each page based on one plot point in the outline provided. Each page has 5 sentences.`},
+        {"role": "system", "content": `Write in ${outline.language}.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
@@ -208,12 +214,11 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   const jsonContent = JSON.parse(step2.choices[0].message.content);
   jsonContent.uuid = uuid.v4();
 
-
   // Create an array of promises for the cover and story images
   const imagePromises = [];
   const crucialImagePromises = [];
 
-  const getImage = (runType === "free") ? getFreeImage : ((runType === "cheap") ? getPaidImage : getImageUrl_bfl);
+  const getImage = (runType === "free" || runType === "cheap") ? getPaidImage : getImageUrl_bfl;
 
   const storyId = jsonContent.uuid;
 
@@ -256,7 +261,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   });
   crucialImagePromises.push(...imagePromises.slice(1, 3));
 
-  const tts = (runType !== "super expensive") ? textToSpeech : textToSpeechElevenLabs;
+  const tts = (runType !== "super expensive" && runType !== "cheap") ? textToSpeech : textToSpeechElevenLabs;
 
   // generate audio files for tts for title and then each page
   await tts(jsonContent.cover.title, `${jsonContent.uuid}/title.mp3`);
@@ -278,12 +283,6 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   await Promise.all(crucialImagePromises);
 
   return jsonContent;
-}
-
-let i = 0
-
-const getFreeImage = async (prompt, level) => {
-  return image_urls[i++ % 11];
 }
 
 const getPaidImage = async (prompt, level) => {

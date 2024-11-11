@@ -5,9 +5,7 @@ function getRunType() {
 }
 
 function setRunType(type) {
-    if (type === 'free' || type === 'cheap' || type === 'expensive') {
-        runType = type;
-    }
+    runType = type;
 }
 
 // Middleware to check if run type is set

@@ -101,6 +101,9 @@ async function getImageUrl_bfl(prompt, level) {
         } else {
             pending = false;
         }
+        if(timeout > 7500) {
+            return await getImageUrl_getimgai(prompt, level);
+        }
     }
     return getData.result.sample;
 }

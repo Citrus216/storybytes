@@ -26,11 +26,11 @@ function promptRunType() {
         const input = data.toString().trim().toLowerCase();
         if (input === 'f') {
             config.setRunType('free');
-            console.log('Run type set to free. (Default Images, Free TTS)');
+            console.log('Run type set to free. (GetImgAI Images, Free TTS)');
             startServer();
         } else if (input === 'c') {
             config.setRunType('cheap');
-            console.log('Run type set to cheap. (GetImgAI Images, Free TTS)');
+            console.log('Run type set to cheap. (GetImgAI Images, ElevenLabs TTS)');
             startServer();
         } else if (input === 'e') {
             config.setRunType('expensive');
@@ -38,7 +38,7 @@ function promptRunType() {
             startServer();
         } else if (input === 'se') {
             config.setRunType('super expensive');
-            console.log('Run type set to expensive. (BFL Images, ElevenLabs TTS)');
+            console.log('Run type set to super expensive. (BFL Images, ElevenLabs TTS)');
             startServer();
         } 
         else {
