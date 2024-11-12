@@ -4,6 +4,7 @@ StoryBytes is a JavaScript-based tool by which short stories and poems can be ge
 
 ### Devpost
 This project was created for HackUMass XII. For more information about it, follow the link to our Devpost page below:
+https://devpost.com/software/storybytes
 
 ## Quickstart guide
 1. Create `.env` file in `backend/`
