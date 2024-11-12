@@ -8,6 +8,7 @@ const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 const { textToSpeech, textToSpeechElevenLabs } = require('./audio.js');
 const { getImageUrl, getImageUrl_getimgai, getImageUrl_bfl, fetchImage } = require('./images');
+const { generatePDF } = require('./pdfs');
 const uuid = require('uuid');
 
 
@@ -24,7 +25,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     model: "gpt-4o",
     messages: [
         {"role": "user", "content": prompt},
-        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 10 plot points. Include multiple characters.`}
+        {"role": "system", "content": `You are creating a high-level outline for a story based on the input "${prompt}" for readers in grade ${level}. Return exactly 10 plot points. Include multiple characters. Make character appearances in English, NOT the language specified.`}
     ],
     response_format: {
       type: "json_schema",
@@ -55,21 +56,21 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
                   },
                   appearance: {
                     type: "string",
-                    description: "Complete and thorough description of the character's appearance"
+                    description: "Complete and thorough description of the character's appearance, in English NOT the language specified"
                   }
                 }
               },
-              description: "Complete and thorough description of all the characters' appearance and personality"
+              description: "Complete and thorough description of all the characters' appearance (in English) and personality"
             },
             plot_points: {
               type: "array",
               items: {
                 type: "string",
-                description: "Brief summary of each page in the story"
+                description: "Brief summary of each page of the story in the language specified"
               }
             }
           },
-          required: ["title", "characters", "plot_points"],
+          required: ["title", "language", "characters", "plot_points"],
           additionalProperties: false
         }
       }
@@ -167,7 +168,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     messages: [
         {"role": "user", "content": step1Output},
         {"role": "system", "content": `You are ${poemMode ? "a poet and illustrator writing a poem" : "an author and illustrator writing a short story"} for children in grade ${level}. All books you write are 10 pages, with each page based on one plot point in the outline provided. Each page has 5 sentences.`},
-        {"role": "system", "content": `Write in ${outline.language}.`}
+        {"role": "system", "content": `Write page text and title in ${outline.language}. Write image descriptions in English, NOT the language specified.`}
     ],
     response_format: {
         // See /docs/guides/structured-outputs
@@ -185,7 +186,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
                       },
                       image_description: {
                         type: "string",
-                        description: "Complete and thorough description of the image for the cover, using the character and event descriptions from the outline."
+                        description: "Complete and thorough description of the image for the cover, using the character and event descriptions from the outline. Write in English, NOT the language specified."
                       }
                     }
                   },
@@ -199,7 +200,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
                         },
                         image_description: {
                           type: "string",
-                          description: "Complete and thorough description of the image for the page, using the character and event descriptions from the outline."
+                          description: "Complete and thorough description of the image for the page, using the character and event descriptions from the outline. Write in English."
                         }
                       },
                       required: ["text", "image_description"]
@@ -213,6 +214,7 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   });
   const jsonContent = JSON.parse(step2.choices[0].message.content);
   jsonContent.uuid = uuid.v4();
+  console.log(jsonContent);
 
   // Create an array of promises for the cover and story images
   const imagePromises = [];
@@ -246,8 +248,8 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
     const completeDescription = `${includedCharacters.map(c => c.appearance).join(", ")}; ${storyItem.image_description}`;
     jsonContent.story[index].image = path.join(storyId, `page${index}.jpg`);
     imagePromises.push(
-      getImage(completeDescription, level).then((image) => {
-        fetchImage(storyId, `page${index}.jpg`, image);
+      getImage(completeDescription, level).then(async (image) => {
+        await fetchImage(storyId, `page${index}.jpg`, image);
       }, 
       (error) => {
         console.error(error);
@@ -281,6 +283,11 @@ const generateStoryText = async (prompt, level, poemMode, runType = "free") => {
   })();
 
   await Promise.all(crucialImagePromises);
+
+  (async () => {
+    await Promise.all(imagePromises);
+    await generatePDF(storyId, [jsonContent.cover.title, ...jsonContent.story.map((page) => page.text)]);
+  })();
 
   return jsonContent;
 }

@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 backend/temp/
+
+.DS_Store
